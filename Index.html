@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <base target="_top">
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css"/>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+      <script src = "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      <!--         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+      <!-- multiselect plugin from https://www.codehim.com/demo/bootstrap-multiselect-dropdown/-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js" integrity="sha512-lxQ4VnKKW7foGFV6L9zlSe+6QppP9B2t+tMMaV4s4iqAv4iHIyXED7O+fke1VeLNaRdoVkVt8Hw/jmZ+XocsXQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.min.css" integrity="sha512-fZNmykQ6RlCyzGl9he+ScLrlU0LWeaR6MO/Kq9lelfXOw54O63gizFMSD5fVgZvU1YfDIc6mxom5n60qJ1nCrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+      <style>
+
+        h1{
+          font-size: calc(1rem + 1.5vw);
+        }
+
+        .dataTables_filter{
+          float:left !important;
+        }
+
+         div.dataTables_wrapper {
+         width: 200%;
+         margin: 0;
+         }
+         
+         td {
+         width: 200px;
+         }
+         th.wrap-is-ok {
+         white-space:normal;
+         max-width: 400px;
+         min-width: 200px;
+         }
+
+         th.wider-col{
+         white-space:normal;
+         max-width: 400px;
+         min-width: 200px;
+         }
+
+         .nav {
+         border: solid rgba(0, 0, 0, .15);
+         border-width: 1px 0;
+         box-shadow: outset 0 .5em 1.5em rgba(0, 0, 0, .1), outset 0.125em .5em rgba(0, 0, 0, .15);
+         //width:200%!important
+         }
+
+        .nav-form, .nav-form *{
+          font-size: 0.8rem !important; 
+          //flex-wrap: nowrap;
+        }
+
+        .nav-bloc{
+          flex-wrap: nowrap;
+        }
+
+        .btn-lg{
+          padding-right: 0.5rem !important; 
+          padding-left: 0.5rem !important; 
+        }
+
+
+         /* Popup container */
+         .popup {
+         position: relative;
+         display: inline-block;
+         cursor: pointer;
+         }
+         /* The actual popup (appears on top) */
+         .popup .popuptext {
+         visibility: hidden;
+         width: 480px;
+         background-color: #555;
+         color: #fff;
+         text-align: center;
+         border-radius: 6px;
+         padding: 8px 4px;
+         position: absolute;
+         z-index: 1;
+         bottom: 125%;
+         left: 50%;
+         margin-left: -80px;
+         }
+         /* Popup arrow */
+         .popup .popuptext::after {
+         content: "";
+         position: absolute;
+         top: 100%;
+         left: 50%;
+         margin-left: -165px;
+         border-width: 5px;
+         border-style: solid;
+         border-color: #555 transparent transparent transparent;
+         }
+         /* Toggle this class when clicking on the popup container (hide and show the popup) */
+         .popup .show {
+         visibility: visible;
+         -webkit-animation: fadeIn 1s;
+         animation: fadeIn 1s
+         }
+         /* Add animation (fade in the popup) */
+         @-webkit-keyframes fadeIn {
+         from {opacity: 0;}
+         to {opacity: 1;}
+         }
+         @keyframes fadeIn {
+         from {opacity: 0;}
+         to {opacity:1 ;}
+         }
+
+        table.dataTable td {
+          font-size: 12px;
+        }
+        table.dataTable tr.dtrg-level-0 td {
+          font-size: 12px;
+        }
+
+      </style>
+
+   </head>
+  <body onload="handleFormSubmit(document.getElementById('search-form'))">
+    <div class="container-fluid navbar bg-light nav">
+      <div class="row">
+        <div class="column">
+          <h1>CuratedDDS: An archive of DDS examples</h1>
+        </div>
+      </div>
+      <div class="row">
+        <form id="search-form" class="d-flex flex-row form-inline nav-form mr-auto" onsubmit="handleFormSubmit(this)">
+          <div class="nav-bloc px-1 column">
+            <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target=".collapse" aria-expanded="true" aria-controls="">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+              <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#meta" aria-expanded="true" aria-controls="meta">
+                <i class="fas fa-chevron-down"></i> | Metadata
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Metadata" data-content="General informations about the article">
+                <i class="fas fa-circle-info"></i>
+                </button>
+            </div>
+            <div id="meta" class="collapse">
+              <div class="form-group mb-1">
+                <label for="searchtitle">Title</label>
+                <input type="text" class="form-select" id="searchtitle" name="searchtitle" placeholder="Search Text" onchange="handleFormSubmit(document.getElementById('search-form'))">
+              </div>
+              <div class="form-group mb-1">
+              <label for="journal">Source </label>
+                <!-- <input type="text" class="form-select" id="journal" name="journal" placeholder="Search Text"> -->
+                <select multiple id="journal" name="journal" class="form-select" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                  <option value="" selected ></option>
+                  <option id="option-journal-Bloomberg" value="Bloomberg">Bloomberg </option>
+                  <option id="option-year-LAT" value="Los Angeles Times">Los Angeles Times</option>
+                  <option id="option-year-ProPublica" value="ProPublica">ProPublica</option>
+                  <option id="option-year-NYT" value="The New York Times">The New York Times</option>
+                  <option id="option-year-WSJ" value="The Wall Street Journal">The Wall Street Journal</option>
+                  <option id="option-year-WashingtonPost" value="WashingtonPost">WashingtonPost</option>
+                </select>
+              </div>
+              <div class="form-group mb-1">
+                <label for="annee">Year of Publication</label>
+                <select multiple id="annee" name="annee" class="form-select" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                  <option value="" selected ></option>
+                  <option id="option-year-2022" value="2022">2022 </option>
+                  <option id="option-year-2021" value="2021">2021</option>
+                  <option id="option-year-2020" value="2020">2020</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+              <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#contexte" aria-expanded="true" aria-controls="contexte">
+                  <i class="fas fa-chevron-down"></i> | Context
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Contexte" data-content="Frame of the project and article's approach"> 
+                <i class="fas fa-circle-info"></i>
+              </button>
+            </div>
+            <div  id="contexte" class="collapse">
+              <div class="form-group mb-1">
+                <label for="but" data-toggle="popover" data-trigger="hover" title="Goal" data-content="What is the authors communication goal ?">Goal</label>
+                <select id="but" name="but" class="form-select" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                  <option value="" selected></option>
+                  <option id="option-objectif-Divertir" value="Entertain">Entertain</option>
+                  <option id="option-objectif-Expliquer"value="Explain">Explain</option>
+                  <option id="option-objectif-Informer"value="Inform">Inform</option>
+                  <option id="option-objectif-Persuader"value="Persuade">Persuade</option>
+                  <option id="option-objectif-Réconforter"value="Comfort">Comfort</option>
+                </select>
+              </div>
+              <div class="form-group mb-1">
+                <label for="sujet" data-toggle="popover" data-trigger="hover" title="Topic" data-content="What is the topic of this article, in the standard of the international press telecommunication council?">Topic</label>
+                <select id="sujet" name="sujet" class="form-select"onchange="handleFormSubmit(document.getElementById('search-form'))">
+                  <option value="" selected ></option>
+                  <option id="option-sujet-autres" value="Other">Other</option>
+                  <option id="option-sujet-arts" value="Arts, culture, entertainment and media">Arts, culture, entertainment and media</option>
+                  <option id="option-sujet-conflit" value="Conflict, war and peace">Conflict, war and peace</option>
+                  <option id="option-sujet-criminalite" value="Crime, law and justice">Crime, law and justice</option>
+                  <option id="option-sujet-desastres" value="Disasters and accidents">Disasters and accidents</option>
+                  <option id="option-sujet-economie" value="Economy and finance">Economy and finance</option>
+                  <option id="option-sujet-education" value="Education">Education</option>
+                  <option id="option-sujet-environnement" value="Environnement">Environnement</option>
+                  <option id="option-sujet-humain" value="Human Interest">Human Interest</option>
+                  <option id="option-sujet-meteo" value="Weather">Weather</option>
+                  <option id="option-sujet-politique" value="Politics">Politics</option>
+                  <option id="option-sujet-religion" value="Religion et croyance">Religion et croyance</option>
+                  <option id="option-sujet-sante" value="Health ">Health </option>
+                  <option id="option-sujet-science" value="Science and technology">Science and technology</option>
+                  <option id="option-sujet-societe" value="Society">Society</option>
+                  <option id="option-sujet-sport" value="Sports">Sports</option>
+                  <option id="option-sujet-travail" value="Work and employment">Work and employment</option>
+                  <option id="option-sujet-loisir" value="Daily life and leisure">Daily life and leisure</option>
+                </select>
+              </div>
+              <div class="form-group mb-1">
+                <label for="structure" data-toggle="popover" data-trigger="hover" title="Structure of the article" data-content="Assortiment du nombre d’unités visuelles, assemblées dans le temps et l’espace, et de l'ordonnancement de leurs éléments visuels.">Structure of the article</label>
+                <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#structure-collapse" aria-expanded="true" aria-controls="structure">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id="structure-collapse" class="collapse">
+                  <div class="form-check">
+                    <input type="checkbox" id="structure1" name="structure" value="Animation" class="form-check-input"onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-animation" for="structure1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Linear progression with the advance of time.">Animation</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure2" name="structure" value="Compilation" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-compilation" for="structure2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Multiple stories brought together, ordered in such a way as to create progression.">Compilation</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure3" name="structure" value="Slideshows" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-diaporama" for="structure3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progression through a series of successive slides.">Slideshows</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure4" name="structure" value="Image Statique" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-image" for="structure4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A single image that forms a story by partitioning the view. The progress of the story comes from the order of reading.">Image Statique</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure5" name="structure" value="Infographie déroulante" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-infographie" for="structure5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Story that progresses as you scroll down the page." onchange="handleFormSubmit(this)">Infographie déroulante</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure6" name="structure" value="Multimédia" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-multimedia" for="structure6" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progress through the opening of successive hyperlinks.">Multimédia</label>
+                  </div>
+                  <div class="form-check">
+                     <input type="checkbox" id="structure7" name="structure" value="Storymap" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                     <label id="option-structure-storymap" for="structure7" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progress with the evolution of a map.">Storymap</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="structure8" name="structure" value="Autre" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-structure-autre" for="structure8" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Another form of progression.">Autre</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+              <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#donnees" aria-expanded="true" aria-controls="donnees">
+                <i class="fas fa-chevron-down"></i> | Data
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Data" data-content="Dataset and its processing">
+                <i class="fas fa-circle-info"></i>
+              </button>
+            </div>
+            <div id="donnees" class="collapse">
+              <div class="form-group mb-1">
+                <label for="forme" data-toggle="popover" data-trigger="hover" title="Form of the data" data-content="Is the data qualitative, quantitative, or both?">Form</label>
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="forme1" name="forme" value="Qualitative" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-forme-qualitative" for="forme1" class="form-check-label">Qualitative</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="checkbox" id="forme2" name="forme" value="Quantitative" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-forme-quantitative" for="forme2" class="form-check-label">Quantitative</label>
+                  </div>
+                </div>  
+              </div>
+              <div class="form-group mb-1">
+                <label for="type" data-toggle="popover" data-trigger="hover" title="Type" data-content="What types of data are contained in the dataset?">Type</label>
+                <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#type-collapse" aria-expanded="true" aria-controls="type">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id="type-collapse" class="collapse">
+                  <div class="form-check">
+                    <input type="checkbox" id="type1" name="type" value="Numerical" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-type-numérique"for="type1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Numerical data.">Numerical</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="type2" name="type" value="Network" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-type-reseau" for="type2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Data representing connections between entities.">Network</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="type3" name="type" value="Spatial" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id= "option-type-spatial"for="type3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Geographical coordinates, routes.">Spatial</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="type4" name="type" value="Chronological" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-type-temporel" for="type4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Informations datées.">Chronological</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="type5" name="type" value="Text" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-type-texte"for="type5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Data from the analysis of a corpus of text.">Text</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="type6" name="type" value="Other" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-type-autre" for="type6" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Data that does not meet one of the above types.">Other</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group mb-1">
+                <label for="analyse"  data-toggle="popover" data-trigger="hover" title="Analysis" data-content="Does the DDS use complex computer analysis techniques such as Machine Learning, Natural Language Processing, or Data Mining to extract additional information from the dataset?">Analysis</label>
+                <input id="option-analyse-oui" class="form-check-input" type="radio" name="analyse" value="Yes" onchange="handleFormSubmit(document.getElementById('search-form'))">  <label id="label-analyse-oui" for="option-analyse-oui">Yes</label>
+                <input id="option-analyse-non" class="form-check-input" type="radio" name="analyse" value="No" onchange="handleFormSubmit(document.getElementById('search-form'))"> <label id="label-analyse-non" for="option-analyse-non">No</label>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+             <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#content" aria-expanded="true" aria-controls="content">
+                <i class="fas fa-chevron-down"></i> | Contents
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Contents" data-content="Visualisations et autres contennus de l'article">
+                <i class="fas fa-circle-info"></i></button>
+            </div>
+            <div id="content" class="form-inline collapse ">
+              <div class="form-group mb-1">
+                <label for="visualisation" data-toggle="popover" data-trigger="hover" title="Visualisation" data-content="Quels types de visualisation font partie de l'article ?">Visualisation</label>
+                <select id="visualisation" name="visualisation" size="3" aria-label="size 3 select" class="form-select" multiple="multiple" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                  <option id="option-viz-autre" value="Other">Other</option>
+                  <option id="option-viz-carte-flux" value="Flow map">Flow map</option>
+                  <option id="option-viz-carte-points" value="Dot map">Dot map</option>
+                  <option id="option-viz-carte-symbole" value="Proportionnal symbol map">Proportionnal symbol map</option>
+                  <option id="option-viz-choropleth" value="Choropleth">Choropleth</option>
+                  <option id="option-viz-choropleth" value="Heatmap">Heatmap</option>
+                  <option id="option-viz-navigation" value="Navigation map">Navigation map</option>
+                  <option id="option-viz-cartogramme" value="Cartogram">Cartogram</option>
+                  <option id="option-viz-barres" value="Bar chart">Bar chart</option>
+                  <option id="option-viz-bulles" value="Bubble chart">Bubble chart</option>
+                  <option id="option-viz-forme" value="Proportional shape chart">Proportional shape chart</option>
+                  <option id="option-viz-circulaire" value="Circular chart">Circular chart</option>
+                  <option id="option-viz-aire" value="Area chart">Area chart</option>
+                  <option id="option-viz-instance" value="Instance diagram">Instance diagram</option>
+                  <option id="option-viz-coordonees-paralleles" value="Parallel coordinates">Parallel coordinates</option>
+                  <option id="option-viz-sankey" value="Sankey diagram">Sankey diagram</option>
+                  <option id="option-viz-chrono" value="Timeline">Timeline</option>
+                  <option id="option-viz-flux" value="Stream graph">Stream graph</option>
+                  <option id="option-viz-aires" value="Area chart">Area chart</option>
+                  <option id="option-viz-radar" value="Radar chart">Radar chart</option>
+                  <option id="option-viz-histogram" value="Histogram">Histogram</option>
+                  <option id="option-viz-infographie" value="Infographic">Infographic</option>
+                  <option id="option-viz-ligne" value="Line chart">Line chart</option>
+                  <option id="option-viz-3D" value="Modèle 3D">3D Model</option>
+                  <option id="option-viz-points" value="Scatterplot">Scatterplot</option>
+                  <option id="option-viz-organigram" value="Organigram">Organigram</option>
+                  <option id="option-viz-pictogram" value="Isotype">Isotype</option>
+                  <option id="option-viz-range" value="Range chart">Range chart</option>
+                  <option id="option-viz-reseau" value="Network">Network</option>
+                  <option id="option-viz-table" value="Table ">Table </option>
+                  <option id="option-viz-moisaique" value="Mosaic chart">Mosaic chart</option>
+                </select>
+              </div>
+              <div class="form-group mb-1">
+                <label for="medias" data-toggle="popover" data-trigger="hover" title="Medias" data-content="What other media outlets are present around viewings?">Medias</label>
+                <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#medias-collapse" aria-expanded="true" aria-controls="medias">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id= "medias-collapse" class="collapse">
+                  <div class="form-check">
+                    <input type="checkbox" id="medias1" name="medias" value="Audio" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-media-audio"for="medias1" class="form-check-label">Audio</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="medias2" name="medias" value="Image" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-media-image"for="medias2" class="form-check-label">Image</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="medias3" name="medias" value="Text" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-media-texte" for="medias3" class="form-check-label">Text</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="checkbox" id="medias4" name="medias" value="Video" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-media-video" for="medias4" class="form-check-label">Video</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group mb-1">
+                <label for="tutoriel" data-toggle="popover" data-trigger="hover" title="Tutorial" data-content="What method is used to show the audience how to get the most out of the article?">Tutorial</label>
+                <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#tuto-collapse" aria-expanded="true" aria-controls="tuto">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div id= "tuto-collapse" class="collapse">
+                  <div class="form-check">
+                    <input type="radio" id="tuto_Sans" name="tutoriel" value="Sans" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-tuto-sans" for="tuto_Sans" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="No tutorials or explanations.">None</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" id="tuto_Explicite" name="tutoriel" value="Explicit" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-tuto-explicite" for="tuto_Explicite" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A text box or paragraph explains the interactive features.">Explicit</label>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" id="tuto_Implicite" name="tutoriel" value="Implicit" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <label id="option-tuto-implicite" for="tuto_Implicite" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A highlight or animation guides the user through the use of interactive features.">Implicit</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+              <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#controls" aria-expanded="true" aria-controls="controls">
+                <i class="fas fa-chevron-down"></i> | Controls
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Controls" data-content="Control over the DDS given to the public">
+                <i class="fas fa-circle-info"></i>
+              </button>
+              <div id="controls" class="form-inline collapse ">
+                <div class="form-group mb-1">
+                  <label for="dlu" data-toggle="popover" data-trigger="hover" title="Users' Degree of Freedom" data-content="How does the project balance the user's autonomous exploration with the author's control?">Users' Degree of Freedom</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#dlu-collapse" aria-expanded="true" aria-controls="dlu">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "dlu-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="radio" id="dlu1" name="dlu" value="Author-driven" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-liberte-auteur" for="dlu1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A purely author-driven approach has a strict linear path through visualization, relies heavily on messaging, and doesn't include any interactivity.">Author-driven</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="radio" id="dlu2" name="dlu" value="Martini glass" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-liberte-martini" for="dlu2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The martini glass structure begins with an author-driven approach, initially using questions, observations, or written articles to introduce the visualization. Once the author's intended narrative is complete, the visualization opens to a reader-focused stage where the user is free to explore the data interactively.">Martini glass</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="radio" id="dlu3" name="dlu" value="Interactive slideshow" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-liberte-diaporama" for="dlu3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The structure of the interactive slideshow follows a typical slideshow format, but incorporates interaction in the middle of the narrative within the confines of each slide. This structure allows the user to further explore particular points of the presentation before moving on to the next stage of the story.">Interactive slideshow</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="radio" id="dlu4" name="dlu" value="Drill-down" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-liberte-forage" for="dlu4" class="form-check-label"  data-toggle="popover" data-trigger="hover" data-content="La structure de Forage présThe drill-down structure presents a general theme and then allows the user to choose from particular instances of that theme to reveal additional details and stories.">Drill-down</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="radio" id="dlu5" name="dlu" value="Reader-driven" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-liberte-lecteur" for="dlu5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A purely reader-driven approach has no prescribed order of images, no messaging, and a high degree of interactivity.">Reader-driven</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="sequence" data-toggle="popover" data-trigger="hover" title="Sequence" data-content="How are the visualization steps progressing?">Sequence</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#sequence-collapse" aria-expanded="true" aria-controls="sequence">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "sequence-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="checkbox" id="sequence1" name="sequence" value="No sequencing" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-sequence-sans"for="sequence1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The structure of the article means that there is no order to progress.">No sequencing</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="sequence2" name="sequence" value="Continuous linear" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-sequence-continue" for="sequence2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progress is made by scrolling down the page.">Continuous linear</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="sequence3" name="sequence" value="Step-by-step linear" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-sequence-etapes" for="sequence3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progress is made by advancing in specific stages.">Step-by-step linear</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="sequence4" name="sequence" value="Non-linear" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-sequence-non" for="sequence4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Progression is made by navigating in a non-linear space.">Non-linear</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="transitions" data-toggle="popover" data-trigger="hover" title="Transitions" data-content="Is there a visual effect associated with progress between stages?">Transitions</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#transitions-collapse" aria-expanded="true" aria-controls="transitions">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "transitions-collapse" class="collapse">
+                    <div class="form-check">
+                       <input type="checkbox" id="transitions1" name="transitions" value="No transitions" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                       <label id="option-transition-sans" for="transitions1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A purely reader-driven approach has no prescribed order of images, no messaging, and a high degree of interactivity.">No transitions</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="transitions2" name="transitions" value="Fading" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-transition-fading" for="transitions2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The content on the screen plays and is replaced by the new content.">Fading </label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="transitions3" name="transitions" value="Swiping" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-transition-swiping" for="transitions3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The content of the screen slides outwards.">Swiping</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="transitions4" name="transitions" value="Tweening" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-transition-tweening" for="transitions4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Content transforms to make room for new content.">Ttweening</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="transitions5" name="transitions" value="Panning" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-transition-panning" for="transitions5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The content on the screen slides in a way that gives the illusion that the new content was off-screen.">Panning</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="progression" data-toggle="popover" data-trigger="hover" title="Progression Indicators" data-content="Visual indicator of the reader's progress">Progression Indicators</label>
+                  <select id="progression" name="progression" class="form-select" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                    <option value="" selected></option>
+                    <option id="option-progression-sans" value="None">None</option>
+                    <option id="option-progression-barre"value="Progress bar">Progress bar</option>
+                    <option id="option-progression-boutons"value="Section buttons">Section buttons</option>
+                    <option id="option-progression-ligne"value="Timeline">Timeline</option>
+                    <option id="option-progression-minicarte"value="Minimap">Minimap</option>
+                    <option id="option-progression-breadcrumbs"value="Breadcrumbs">Breadcrumbs</option>
+                    <option id="option-progression-checklist"value="Checklist">Checklist</option>
+                  </select>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="interactions" data-toggle="popover" data-trigger="hover" title="Interactions" data-content="Options offered to the reader to interact with the visualizations and make them their own">Interactions</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#interactions-collapse" aria-expanded="true" aria-controls="interactions">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "interactions-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions1" name="interactions" value="None" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-sans" for="interactions1" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The article does not propose interaction.">None</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions2" name="interactions" value="Abstraction/Elaboration" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-abstraction" for="interactions2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Shows more or less detail.">Abstraction/Elaboration</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions3" name="interactions" value="Comparaison" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-comparaison" for="interactions3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Show two items to compare them.">Comparison</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions4" name="interactions" value="Connection" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-connection" for="interactions4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Shows related items.">Connection</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions5" name="interactions" value="Encodage" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-encodage" for="interactions5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Shows a different representation.">Encoding</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions6" name="interactions" value="Exploration" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-exploration" for="interactions6" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Show something else.">Exploration</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions7" name="interactions" value="Filtre" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-filtre" for="interactions7" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Shows something conditionally.">Filter</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions8" name="interactions" value="Reconfiguration" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-reconfiguration" for="interactions8" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Shows a different configuration.">Reconfiguration</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="interactions9" name="interactions" value="Sélection" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-interactions-selection" for="interactions9" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Marks something as interesting.">Select</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1 column">
+            <div>
+              <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#schemas" aria-expanded="true" aria-controls="schemas">
+                <i class="fas fa-chevron-down"></i> | Narrative Patterns
+              </button>
+              <button type="button" class="btn btn-lg" data-toggle="popover" data-trigger="hover" title="Narrative Patterns" data-content=" Narrative pattern is a low-level narrative device that serves a specific intent. A pattern can be used individually or in combination with others to give form to a story.">
+                <i class="fas fa-circle-info"></i>
+              </button>
+              <div id="schemas" class="collapse">
+                <div class="form-group mb-1">
+                  <label for="schemas_argumentatifs" data-toggle="popover" data-trigger="hover" title="Patterns for Argumentation" data-content="Patterns used to persuade and convince the audience.">Patterns for Argumentation</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#argu-collapse" aria-expanded="true" aria-controls="argu">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "argu-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_argumentatifs1" name="schemas_argumentatifs" value="None" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-argu-sans"for="schemas_argumentatifs1" class="form-check-label">None</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_argumentatifs2" name="schemas_argumentatifs" value="Comparaison" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-argu-comparaison" for="schemas_argumentatifs2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The narrator presents two or more sets of data and draws respective conclusions.">Comparison</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_argumentatifs3" name="schemas_argumentatifs" value="Concrétisation" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id= "option-argu-concretisation" for="schemas_argumentatifs3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Illustrate abstract concepts with concrete objects. Each data point is represented by an individual visual object, making them less abstract than aggregated statistics.">Concretize</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_argumentatifs4" name="schemas_argumentatifs" value="Répétition" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-argu-repetition"for="schemas_argumentatifs4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Repetition can also help with argumentation, as it can increase the importance and memorability of a message, and can help tie different arguments together on a given data set. Repetition can be used as a way to look up an answer in the data.">Repetition</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="schemas_cadrage" data-toggle="popover" data-trigger="hover" title="Patterns for Framing the Narrative" data-content="Patterns used to integrate the audience into the story or keep them at a distance">Patterns for Framing the Narrative</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#cadrage-collapse" aria-expanded="true" aria-controls="cadrage">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "cadrage-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_cadrage1" name="schemas_cadrage" value="None" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-cadrage-sans"for="schemas_cadrage1" class="form-check-label">None</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_cadrage2" name="schemas_cadrage" value="Defamiliarization" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-cadrage-defamiliarisation" for="schemas_cadrage2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Defamiliarization defies audience expectations, presenting something familiar in an unexpected way.">Defamiliarization</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_cadrage3" name="schemas_cadrage" value="Familiariszation" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-cadrage-familiarisation" for="schemas_cadrage3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Familiarization helps create a familiar setting for the audience so they can connect data elements to what they already know.">Familiariszation</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_cadrage4" name="schemas_cadrage" value="PPhysical metaphor" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-cadrage-metaphore" for="schemas_cadrage4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Depict an element of the narrative with a more tangible symbol.">Physical metaphor</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_cadrage5" name="schemas_cadrage" value="Convention breaking" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-cadrage-rupture" for="schemas_cadrage5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Breaking convention can also be used by first establishing a graphic convention through, for example, color, scales, or visual rhythm in the narrative, and then disrupting it at a specific point.">Convention breaking</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group mb-1">
+                  <label for="schemas_engagement_empathie" data-toggle="popover" data-trigger="hover" title="Pattern for engagement and empathy" data-content="Patterns used to engage the audience deeper" data-toggle="popover" data-trigger="hover">Pattern for engagement and empathy</label>
+                  <button class="btn btn-secondary btn-sm m-2" type="button" data-toggle="collapse" data-target="#ee-collapse" aria-expanded="true" aria-controls="ee">
+                    <i class="fas fa-chevron-down"></i>
+                  </button>
+                  <div id= "ee-collapse" class="collapse">
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie1" name="schemas_engagement_empathie" value="None" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-sans" for="schemas_engagement_empathie1" class="form-check-label">None</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie2" name="schemas_engagement_empathie" value="Speed-up/slow-down" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-acceleration" for="schemas_engagement_empathie2" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Storytelling is slowed down and focused on a single aspect of the data, while leaving the user alone with the data. The opposite of slowdowns and pauses is the acceleration of the narrative or presentation of data.">Speed-up/slow-down</label> 
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie3" name="schemas_engagement_empathie" value="Breaking the 4th wall" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-rupture" for="schemas_engagement_empathie3" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Speaking directly to the audience, the narrator breaks the fourth-wall.">Breaking the 4th wall</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie4" name="schemas_engagement_empathie" value="Make a guess" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-devinette" for="schemas_engagement_empathie4" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="Asking the audience to guess the data or outcome of a series of events presented in the narrative can allow them to control the unfolding of the story.">Make a guess</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie5" name="schemas_engagement_empathie" value="Exploration" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-exploration" for="schemas_engagement_empathie5" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The audience is faced with a complex interface where data parameters can be set freely.">Exploration</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie6" name="schemas_engagement_empathie" value="Humans behind the dots" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-humains" for="schemas_engagement_empathie6" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="The humans behind the dots patterns involves presenting individual stories through on-demand details in a visualization.">Humans behind the dots</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie7" name="schemas_engagement_empathie" value="Rethorical question" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-rethorique" for="schemas_engagement_empathie7" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="By speaking directly to the audience, a rhetorical question can connect the narrator to the audience and trigger their willingness to answer that question, even if only for a moment.">Rethorical question</label>
+                    </div>
+                    <div class="form-check">
+                      <input type="checkbox" id="schemas_engagement_empathie8" name="schemas_engagement_empathie" value="Gradual reveal" class="form-check-input" onchange="handleFormSubmit(document.getElementById('search-form'))">
+                      <label id="option-ee-revelation" for="schemas_engagement_empathie8" class="form-check-label" data-toggle="popover" data-trigger="hover" data-content="A common pattern is revelation, in which elements of the data are gradually revealed, eventually leading to the big picture and the final argument.">Gradual reveal</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="nav-bloc px-1">
+            <input id="resetForm" class="btn btn-outline-primary m-2" type="reset" onclick="handleFormSubmit('None')">
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div id="table-container" class="mt-3 m-2">
+              <table id="data-table" class="table table-responsive table-striped table-sm table-hover table-bordered ">
+                  <!-- Table data is added by the showData() function -->
+                  <thead>
+                    <tr>
+                      <th colspan="4">Metadata</th>
+                      <th colspan="3">Context</th>
+                      <th colspan="3">Data</th>
+                      <th colspan="3">Contents</th>
+                      <th colspan="5">Control</th>
+                      <th colspan="3">Narrative Patterns</th>
+                    </tr>
+                      <tr>
+                      <th>Title</th>
+                      <th>Link</th>
+                      <th>Source</th>
+                      <th>Year</th>
+                      <th>Goal</th>
+                      <th>Topic</th>
+                      <th>Structure</th>
+                      <th>Form</th>
+                      <th>Type</th>
+                      <th>Analysis</th>
+                      <th>Data Visualization</th>
+                      <th>Media</th>
+                      <th>Tutorial</th>
+                      <th>Users' Degree of Freedom</th>
+                      <th>Sequence</th>
+                      <th>Transitions</th>
+                      <th>Progression</th>
+                      <th>Interactions</th>
+                      <th>Patterns for Argumentation</th>
+                      <th>Patterns for Framing the Narrative</th>
+                      <th>Patterns for Engagement and Empathy</th>
+                    </tr>
+                  </thead>
+              </table>
+            </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Enable popovers everywhere https://getbootstrap.com/docs/4.0/components/popovers/
+    $(function () { 
+      $('[data-toggle="popover"]').popover()
+    })
+         
+         
+  //PREVENT FORMS FROM SUBMITTING / PREVENT DEFAULT BEHAVIOUR
+  function preventFormSubmit() {
+    var forms = document.querySelectorAll('form');
+    for (var i = 0; i < forms.length; i++) {
+      forms[i].addEventListener('submit', function(event) {
+      event.preventDefault();
+      });
+    }
+  }
+  window.addEventListener("load", preventFormSubmit, true); 
+
+  //HANDLE FORM SUBMISSION
+  function handleFormSubmit(formObject) {
+    google.script.run.withSuccessHandler(showData).processForm(formObject);
+  }
+
+  function showData(dataArray){ // Generate the table from the data array
+    console.log(dataArray)
+    amounts = dataArray[1]
+    console.log(document.getElementById("option-year-2022"))
+    document.getElementById("option-year-2022").textContent = "2022 (" + amounts[3][2] +")"
+    document.getElementById("option-year-2021").textContent = "2021 (" + amounts[3][1] +")"
+    document.getElementById("option-year-2020").textContent = "2020 (" + amounts[3][0] +")"
+    console.log(document.getElementById("option-objectif-Divertir"))
+    document.getElementById("option-objectif-Divertir").textContent = "Entertain (" + amounts[4][0] +")"
+    document.getElementById("option-objectif-Expliquer").textContent = "Explain (" + amounts[4][1] +")"
+    document.getElementById("option-objectif-Informer").textContent = "Inform (" + amounts[4][2] +")"
+    document.getElementById("option-objectif-Persuader").textContent = "Persuade (" + amounts[4][3] +")"
+    document.getElementById("option-objectif-Réconforter").textContent = "Comfort (" + amounts[4][4] +")"
+    console.log(document.getElementById("option-sujet-autres"))
+    document.getElementById("option-sujet-autres").textContent = "Other (" + amounts[5][0] +")"
+    document.getElementById("option-sujet-arts").textContent = "Arts, culture, entertainment and media (" + amounts[5][1] +")"
+    document.getElementById("option-sujet-conflit").textContent = "Conflict, war and peace (" + amounts[5][2] +")"
+    document.getElementById("option-sujet-criminalite").textContent = "Crime, law and justice (" + amounts[5][3] +")"
+    document.getElementById("option-sujet-desastres").textContent = "Disasters and accidents (" + amounts[5][4] +")"
+    document.getElementById("option-sujet-economie").textContent = "Economy and finance (" + amounts[5][5] +")"
+    document.getElementById("option-sujet-education").textContent = "Education (" + amounts[5][6] +")"
+    document.getElementById("option-sujet-environnement").textContent = "Environnement (" + amounts[5][7] +")"
+    document.getElementById("option-sujet-humain").textContent = "Human Interest (" + amounts[5][8] +")"
+    document.getElementById("option-sujet-meteo").textContent = "Weather (" + amounts[5][9] +")"
+    document.getElementById("option-sujet-politique").textContent = "Politics (" + amounts[5][10] +")"
+    document.getElementById("option-sujet-religion").textContent = "Religion and belief (" + amounts[5][11] +")"
+    document.getElementById("option-sujet-sante").textContent = "Health (" + amounts[5][12] +")"
+    document.getElementById("option-sujet-science").textContent = "Science and technology (" + amounts[5][13] +")"
+    document.getElementById("option-sujet-societe").textContent = "Society (" + amounts[5][14] +")"
+    document.getElementById("option-sujet-sport").textContent = "Sports (" + amounts[5][15] +")"
+    document.getElementById("option-sujet-travail").textContent = "Work and employment (" + amounts[5][16] +")"
+    document.getElementById("option-sujet-loisir").textContent = "Daily life and leisure (" + amounts[5][17] +")"
+    console.log(document.getElementById("option-structure-animation"))
+    document.getElementById("option-structure-animation").textContent = "Animation (" + amounts[6][0] +")"
+    document.getElementById("option-structure-compilation").textContent = "Compilation (" + amounts[6][1] +")"
+    document.getElementById("option-structure-diaporama").textContent = "Slideshows (" + amounts[6][2] +")"
+    document.getElementById("option-structure-image").textContent = "Static Image (" + amounts[6][3] +")"
+    document.getElementById("option-structure-infographie").textContent = "Longform Infographics (" + amounts[6][4] +")"
+    document.getElementById("option-structure-multimedia").textContent = "Multimedia (" + amounts[6][5] +")"
+    document.getElementById("option-structure-storymap").textContent = "Storymap (" + amounts[6][6] +")"
+    document.getElementById("option-structure-autre").textContent = "Other (" + amounts[6][7] +")"
+    console.log(document.getElementById("option-forme-qualitative"))
+    document.getElementById("option-forme-qualitative").textContent = "Qualitative (" + amounts[7][0] +")"
+    document.getElementById("option-forme-quantitative").textContent = "Quantitative (" + amounts[7][1] +")"
+    console.log(document.getElementById("option-type-numérique"))
+    document.getElementById("option-type-numérique").textContent = "Numerical (" + amounts[8][0] +")"
+    document.getElementById("option-type-reseau").textContent = "Network (" + amounts[8][1] +")"
+    document.getElementById("option-type-spatial").textContent = "Spatial (" + amounts[8][2] +")"
+    document.getElementById("option-type-temporel").textContent = "Chronological (" + amounts[8][3] +")"
+    document.getElementById("option-type-texte").textContent = "Text (" + amounts[8][4] +")"
+    document.getElementById("option-type-autre").textContent = "Other (" + amounts[8][5] +")"
+    console.log(document.getElementById("option-analyse-non"))
+    document.getElementById("label-analyse-oui").textContent = "Yes (" + amounts[9][0] +")"
+    document.getElementById("label-analyse-non").textContent = "No (" + amounts[9][1] +")"
+
+/*     const list = document.getElementsByClassName("multiselect-native-select")[0].getElementsByClassName("form-check-label");
+    console.log(list)
+    console.log(list[0].textContent) = "Autre (" + amounts[10][0] +")"
+    list[0].textContent = "Autre (" + amounts[10][0] +")"
+
+ */
+
+    //console.log(document.getElementById("option-media-audio"))
+    document.getElementById("option-media-audio").textContent = "Audio (" + amounts[11][0] +")"
+    document.getElementById("option-media-image").textContent = "Image (" + amounts[11][1] +")"
+    document.getElementById("option-media-texte").textContent = "Text (" + amounts[11][2] +")" 
+    document.getElementById("option-media-video").textContent = "Video (" + amounts[11][3] +")"
+    //console.log(document.getElementById("option-tuto-sans"))
+    document.getElementById("option-tuto-sans").textContent = "None (" + amounts[12][0] +")"
+    document.getElementById("option-tuto-explicite").textContent = "Explicit (" + amounts[12][1] +")"
+    document.getElementById("option-tuto-implicite").textContent = "Implicit (" + amounts[12][2] +")"
+    //console.log(document.getElementById("option-liberte-auteur"))
+    document.getElementById("option-liberte-auteur").textContent = "Author-Driven (" + amounts[13][0] +")"
+    document.getElementById("option-liberte-martini").textContent = "Martini Glass Structure (" + amounts[13][4] +")"
+    document.getElementById("option-liberte-diaporama").textContent = "Interactive Slideshow (" + amounts[13][2] +")" 
+    document.getElementById("option-liberte-forage").textContent = "Drill-Down Story (" + amounts[13][3] +")"
+    document.getElementById("option-liberte-lecteur").textContent = "Reader Driven (" + amounts[13][1] +")"
+//console.log(document.getElementById("option-sequence-sans"))
+    document.getElementById("option-sequence-sans").textContent = "No sequencing (" + amounts[14][0] +")"
+    document.getElementById("option-sequence-continue").textContent = "Continuous linear (" + amounts[14][1] +")"
+    document.getElementById("option-sequence-etapes").textContent = "Step-by-step linear (" + amounts[14][2] +")" 
+    document.getElementById("option-sequence-non").textContent = "Non-Linear (" + amounts[14][3] +")"
+//console.log(document.getElementById("option-transition-sans"))
+    document.getElementById("option-transition-sans").textContent = "No transtions (" + amounts[15][0] +")"
+    document.getElementById("option-transition-fading").textContent = "Fading (" + amounts[15][1] +")"
+    document.getElementById("option-transition-swiping").textContent = "Swiping (" + amounts[15][2] +")" 
+    document.getElementById("option-transition-tweening").textContent = "Tweening (" + amounts[15][3] +")"
+    document.getElementById("option-transition-panning").textContent = "Panning (" + amounts[15][4] +")"
+//console.log(document.getElementById("option-progression-sans"))
+    document.getElementById("option-progression-sans").textContent = "No indicators (" + amounts[16][0] +")"
+    document.getElementById("option-progression-barre").textContent = "Progress bar (" + amounts[16][1] +")" 
+    document.getElementById("option-progression-boutons").textContent = "Section Buttons (" + amounts[16][2] +")"
+    document.getElementById("option-progression-ligne").textContent = "Timeline (" + amounts[16][3] +")"
+    document.getElementById("option-progression-minicarte").textContent = "Minimap (" + amounts[16][4] +")" 
+    document.getElementById("option-progression-breadcrumbs").textContent = "Breadcrumbs (" + amounts[16][5] +")"
+    document.getElementById("option-progression-checklist").textContent = "Checklist (" + amounts[16][6] +")"
+//console.log(document.getElementById("option-interactions-sans"))
+    document.getElementById("option-interactions-sans").textContent = "No interaction (" + amounts[17][0] +")"
+    document.getElementById("option-interactions-abstraction").textContent = "Abstraction/Elaboration (" + amounts[17][1] +")"
+//console.log(document.getElementById("option-interactions-comparaison"))
+    document.getElementById("option-interactions-comparaison").textContent = "Comparaison (" + amounts[17][2] +")"
+//console.log(document.getElementById("option-interactions-connection"))
+    document.getElementById("option-interactions-connection").textContent = "Connection (" + amounts[17][3] +")"
+//console.log(document.getElementById("option-interactions-encodage"))
+    document.getElementById("option-interactions-encodage").textContent = "Encoding (" + amounts[17][4] +")"
+//console.log(document.getElementById("option-interactions-exploration")) 
+    document.getElementById("option-interactions-exploration").textContent = "Exploration (" + amounts[17][5] +")"
+//console.log(document.getElementById("option-interactions-filtre")) 
+    document.getElementById("option-interactions-filtre").textContent = "Filter (" + amounts[17][6] +")"
+//console.log(document.getElementById("option-interactions-reconfiguration")) 
+    document.getElementById("option-interactions-reconfiguration").textContent = "Reconfiguration (" + amounts[17][7] +")"
+//console.log(document.getElementById("option-interactions-selection")) 
+    document.getElementById("option-interactions-selection").textContent = "Selection (" + amounts[17][8] +")"
+//console.log(document.getElementById("option-argu-sans"))
+    document.getElementById("option-argu-sans").textContent = "None (" + amounts[18][0] +")"
+    document.getElementById("option-argu-comparaison").textContent = "Compare (" + amounts[18][1] +")" 
+    document.getElementById("option-argu-concretisation").textContent = "Concretize (" + amounts[18][2] +")"
+    document.getElementById("option-argu-repetition").textContent = "Repetition (" + amounts[18][3] +")"
+//console.log(document.getElementById("option-cadrage-sans"))
+    document.getElementById("option-cadrage-sans").textContent = "None (" + amounts[19][0] +")"
+    document.getElementById("option-cadrage-defamiliarisation").textContent = "Defamiliarization (" + amounts[19][1] +")" 
+    document.getElementById("option-cadrage-familiarisation").textContent = "Familiarization (" + amounts[19][2] +")"
+    document.getElementById("option-cadrage-metaphore").textContent = "Physical metaphor (" + amounts[19][3] +")"
+    document.getElementById("option-cadrage-rupture").textContent = "Convention breaking (" + amounts[19][4] +")" 
+//console.log(document.getElementById("option-ee-sans"))
+    document.getElementById("option-ee-sans").textContent = "None (" + amounts[20][0] +")"
+    document.getElementById("option-ee-acceleration").textContent = "Speed-up/slow-down (" + amounts[20][1] +")" 
+    document.getElementById("option-ee-rupture").textContent = "Breaking the 4th wall (" + amounts[20][2] +")"
+    document.getElementById("option-ee-devinette").textContent = "Make a guess (" + amounts[20][3] +")"
+    document.getElementById("option-ee-exploration").textContent = "Exploration (" + amounts[20][4] +")" 
+    document.getElementById("option-ee-humains").textContent = "Humans behind the dots (" + amounts[20][5] +")"
+    document.getElementById("option-ee-rethorique").textContent = "Rethorical question (" + amounts[20][6] +")"
+    document.getElementById("option-ee-revelation").textContent = "Gradual reveal (" + amounts[20][7] +")"        
+
+    $('#data-table').DataTable({
+      fixedHeader: true,
+      destroy: true,
+      data: dataArray[0],
+      order: [[0,"asc"]],
+      bPaginate: false, 
+      scrollCollapse: true,
+      scrollY: '600px',
+      columns: [
+        {
+          title:"Title",
+          class:"wrap-is-ok" // based on https://datatables.net/forums/discussion/40323/wrap-only-a-single-column-in-a-specific-table
+        },
+        {
+          "title":"Link",
+          render: function(data,type) {
+            if (type === 'display') {
+              let link = data;
+              return '<a href="' + link + '" class="btn btn-primary btn-sm" target="_blank">' + "Open" + '</a>';
+            } else {
+            return "Lien"
+          }
+        }
+      },
+      {title:"Source"},
+      {title:"Year"},
+          {title:"Goal"},
+          {title:"Topic"},
+          {title:"Structure"},
+          {title:"Form"},
+          {title:"Type"},
+          {title:"Analysis"},
+          {title:"Data Visualization", class: 'wider-col'},
+          {title:"Media"},
+          {title:"Tutorial"},
+          {title:"Users' Degree of Freedom"},
+          {title:"Sequence"},
+          {title:"Transitions"},
+          {title:"Progression"},
+          {title:"Interactions"},
+          {title:"Patterns for Argumentation"},
+          {title:"Patterns for Framing the Narrative"},
+          {title:"Patterns for Engagement and Empathy"}
+        ]
+      });
+    }
+
+
+    function deleselectAll() {
+      console.log("deselect all activated")
+      console.log($('#form-select'))
+      $('#form-select option').removeAttr("selected");
+    };
+
+    $(document).ready(function() {
+      $('#visualisation').multiselect();
+    });
+             
+  </script>
+</html>
